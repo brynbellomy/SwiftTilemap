@@ -174,7 +174,10 @@ public class TilemapPolylineObject : TilemapObject
     public let points: [CGPoint]
 
     /** The polyline's position is equal to the first point in `points`.  Correspondingly, its `path` is centered at (0, 0). */
-    override public var position: CGPoint { return points.first! }
+    override public var position: CGPoint { return storedPosition }
+
+    /** The backing variable for the public `position` property. */
+    private var storedPosition: CGPoint
 
     /** The size of the polyline's bounding box. */
     override public var size: CGSize { return rect.size }
@@ -190,8 +193,19 @@ public class TilemapPolylineObject : TilemapObject
     /** The rectangle as CGRect, for convenience. Rect origin is the same as position, rect size the same as size. */
     override public var rect: CGRect { return CGPathGetBoundingBox(path) }
 
-    public init(name n:String?, properties prop:TMXDictionary?, points pts:[CGPoint])
+    /**
+        The designated initializer.
+    
+        :param: name The `name` property from the object in the TMX file.
+        :param: properties The entire `properties` dictionary from the object in the TMX file.
+        :param: points An array of `CGPoint` values describing the polyline's path.
+        :param: position The point at which to center the polyline in its parent coordinate space.
+    */
+    public init(name n:String?, properties prop:TMXDictionary?, points pts:[CGPoint], position:CGPoint)
     {
+        storedPosition = position
+
+        var ptsStr = ", ".join(pts.map { $0.bk_shortDescription })
         points = pts
         if points.count <= 0 {
             fatalError("TilemapPolylineObject cannot be initialized with an empty array of points.")
@@ -199,11 +213,13 @@ public class TilemapPolylineObject : TilemapObject
 
         super.init(name:n, properties:prop)
 
-        path = CGPath.fromPoints(pts, closePath: self.dynamicType.closed)
+        storedPath = CGPath.fromPoints(pts, closePath: self.dynamicType.closed)
     }
 
     /** Returns the string key used to retrieve the points from the TMX object dictionary.  The respective keys for polylines and polygons are different.  */
     internal class var pointsConfigKey:  String { return "polylinePoints" }
+
+    /** Indicates whether or not the line's first point should be automatically connected to its last point.  A polyline is not closed, while a polygon is. */
     internal class var closed: Bool   { return false }
 }
 
@@ -215,8 +231,11 @@ public class TilemapPolylineObject : TilemapObject
 /** A closed polygon made up of points. It has no size and position is its first point. */
 public class TilemapPolygonObject: TilemapPolylineObject
 {
-    override internal class var pointsConfigKey  : String { return "polygonPoints" }
-    override internal class var closed : Bool   { return true }
+    /** Returns the string key used to retrieve the points from the TMX object dictionary.  The respective keys for polylines and polygons are different.  */
+    override internal class var pointsConfigKey: String { return "polygonPoints" }
+
+    /** Indicates whether or not the line's first point should be automatically connected to its last point.  A polyline is not closed, while a polygon is. */
+    override internal class var closed: Bool { return true }
 }
 
 
