@@ -91,10 +91,12 @@ public struct TilemapObjectFactory //: IConfigurableBuilder
                                         <*> size     ?± missingValueFailure("size")
 
             case .Polyline:  return buildPolyline(name, properties)
-                                        <^> points ?± missingValueFailure("points")
+                                        <^> position ?± missingValueFailure("position")
+                                        <*> points ?± missingValueFailure("points")
 
             case .Polygon:   return buildPolygon(name, properties)
-                                        <^> points ?± missingValueFailure("points")
+                                        <^> position ?± missingValueFailure("position")
+                                        <*> points ?± missingValueFailure("points")
 
         }
     }
@@ -113,12 +115,12 @@ private func buildRectangle (name:String?, properties:TMXDictionary?) (position:
     return TilemapRectangleObject(name:name, properties:properties, position:position, size:size)
 }
 
-private func buildPolygon (name:String?, properties:TMXDictionary?) (points:[CGPoint]) -> TilemapPolygonObject {
-    return TilemapPolygonObject(name:name, properties:properties, points:points)
+private func buildPolygon (name:String?, properties:TMXDictionary?) (position:CGPoint) (points:[CGPoint]) -> TilemapPolygonObject {
+    return TilemapPolygonObject(name:name, properties:properties, points:points, position:position)
 }
 
-private func buildPolyline (name:String?, properties:TMXDictionary?) (points:[CGPoint]) -> TilemapPolylineObject {
-    return TilemapPolylineObject(name:name, properties:properties, points:points)
+private func buildPolyline (name:String?, properties:TMXDictionary?) (position:CGPoint) (points:[CGPoint]) -> TilemapPolylineObject {
+    return TilemapPolylineObject(name:name, properties:properties, points:points, position:position)
 }
 
 
