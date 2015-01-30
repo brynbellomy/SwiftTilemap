@@ -13,7 +13,7 @@ Pod::Spec.new do |s|
 
   s.dependency 'LlamaKit'
 
-  s.dependency 'Funky'
+  s.dependency 'Funky', '0.1.2'
   s.dependency 'SwiftyJSON'
   s.dependency 'SwiftLogger'
   s.dependency 'SwiftConfig'
